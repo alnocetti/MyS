@@ -52,13 +52,24 @@ var instance = functionPlot({
     //   }
     },
     {
-        fnType: "implicit",
-        color: "green",
-        fn: "x = 3 + 0*y"
+        points: [
+          [1, 1],
+          [2, 1],
+          [2, 2],
+          [1, 2],
+          [1, 1]
+        ],
+        fnType: 'points',
+        graphType: 'scatter'
+      }
+    // {
+        // fnType: "implicit",
+        // color: "green",
+        // fn: "x = 3 + 0*y"
         // fnType: "points",
         // color: "red",
         // points: "0,1"
-    },
+    // },
   ],
 });
 
