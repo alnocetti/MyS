@@ -5,6 +5,8 @@
   "main": "test/src/index.js",
   "dependencies": {
     "bootstrap": "^4.3.1",
+    "d3": "^3.5.17",
+    "function-plot": "^1.19.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-scripts": "3.0.1"
