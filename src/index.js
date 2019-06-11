@@ -15,21 +15,82 @@ import d3 from "d3";
 
 class Grafico{
 
+
+
     draw_graph = function() {
-        instance.options.xAxis.domain[0] = parseInt(document.getElementById("a").value);
-        instance.options.xAxis.domain[1] = parseInt(document.getElementById("b").value);
+        var xMin = parseInt(document.getElementById("a").value);
+        var xMax = parseInt(document.getElementById("b").value);
+
+        instance.options.data[0].range[0] = xMin;
+        instance.options.data[0].range[1] = xMax;
         if (document.getElementById("fx").value !== ""){
             instance.options.data[0].fn = document.getElementById("fx").value;
         }
-        // var ejeX = [parseInt(document.getElementById("a").value), parseInt(document.getElementById("b").value)];
-
-        // console.log(ejeX);
         instance.draw();
-        // console.log(document.getElementById("fx").value)
-        // console.log(instance.options.data[0].fn);
+        
+    }
+
+    genRandomPoints = function(){
+
+      this.getMax();
+
+    }
+    
+    getMax = function(){
+      var xMin = parseInt(document.getElementById("a").value);
+      var xMax = parseInt(document.getElementById("b").value);     
+      var shots = parseInt(document.getElementById("shots").value);
+      var yMax = 0;
+
+      for(var shot = 1; shot <= shots; shot ++){
+
+        var xToEvaluate = Math.random() * (+xMax - +xMin) + +xMin;
+  
+        var datum = instance.options.data[0]
+        var scope = {
+          x: xToEvaluate
+        }
+        console.log('evaluated: ' + xToEvaluate + 'result: ' + functionPlot.eval.builtIn(datum,'fn',scope))
+
+        if(yMax < functionPlot.eval.builtIn(datum,'fn',scope)){
+          yMax = functionPlot.eval.builtIn(datum,'fn',scope)
+        }
+
+      }
+      console.log('Max found: ' + yMax);
+      console.log('New max: ' + yMax * 1.20);
+
+    }
+    
+    getMin = function(){
+      var xMin = parseInt(document.getElementById("a").value);
+      var xMax = parseInt(document.getElementById("b").value);     
+      var shots = parseInt(document.getElementById("shots").value);
+      var yMin = 0;
+
+      for(var shot = 1; shot <= shots; shot ++){
+
+        var xToEvaluate = Math.random() * (+xMax - +xMin) + +xMin;
+  
+        var datum = instance.options.data[0]
+        var scope = {
+          x: xToEvaluate
+        }
+        console.log('evaluated: ' + xToEvaluate + 'result: ' + functionPlot.eval.builtIn(datum,'fn',scope))
+
+        if(yMin > functionPlot.eval.builtIn(datum,'fn',scope)){
+          yMin = functionPlot.eval.builtIn(datum,'fn',scope)
+        }
+
+      }
+      console.log('Min found: ' + yMin);
+      console.log('New Min: ' + yMin * 1.20);
+
+    
     }
 
 }
+
 window.d3 = d3;
 
 const functionPlot = require("function-plot");
@@ -46,6 +107,7 @@ var instance = functionPlot({
   data: [
     {
       fn: "x^3",
+      range: [-10,10]
     //   derivative: {
     //     fn: "2 * x",
     //     updateOnMouseMove: true
@@ -75,3 +137,5 @@ var instance = functionPlot({
 
 var grafico = new Grafico();
 document.getElementById("btn").addEventListener("click" , grafico.draw_graph);
+
+document.getElementById("btn").addEventListener("click" , grafico.getMax);
