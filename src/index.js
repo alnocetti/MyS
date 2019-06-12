@@ -16,98 +16,31 @@ import d3 from "d3";
 class Grafico{
 
     draw_graph = function() {
-         var xMin = parseInt(document.getElementById("a").value);
-         var xMax = parseInt(document.getElementById("b").value);
-
-        instance.options.data[0].range[0] = xMin;
-        instance.options.data[0].range[1] = xMax;
+        
+        instance.options.data[1].points = [];
+        instance.options.data[2].points = [];
+   
         if (document.getElementById("fx").value !== ""){
             instance.options.data[0].fn = document.getElementById("fx").value;
         }
+        var xMin = parseInt(document.getElementById("a").value);
+        var xMax = parseInt(document.getElementById("b").value);
+        var yMax = getMax();
+        var yMin = getMin();
+        var area = (xMax - xMin) * (yMax - yMin);
+        var points = genRandomPoints(xMin, xMax, yMin, yMax);
+        var greenPoints = points[0];
+        var redPoints = points[1];
+
+        var result = area * (greenPoints / (greenPoints + redPoints));
+        document.getElementById("result").value = result;
+        console.log('Result: ' + result);
+        console.log('yMin: ' + yMin + '  yMax: ' + yMax);
+        instance.options.data[0].range[0] = xMin;
+        instance.options.data[0].range[1] = xMax;
+
         instance.draw();
-
-        
     }
-
-    genRandomPoints = function(){
-      var xMin = parseInt(document.getElementById("a").value);
-      var xMax = parseInt(document.getElementById("b").value);
-
-      var yMax = this.getMax;
-      var yMin = this.getMin;
-      console.log('y max: ' + yMax);
-      console.log('y min: ' + yMin);
-
-
-      var shots = parseInt(document.getElementById("shots").value);
-
-      instance.options.data[1].fnType = 'points';
-      instance.options.data[1].graphType = 'scatter';
-
-      for(var shot = 0; shot <= shots; shot ++){
-
-        var xPoint = Math.random() * (+xMax - +xMin) + +xMin;
-        var yPoint = Math.random() * (+yMax - +yMin) + +yMin;
-
-        instance.options.data[1].points.push([xPoint,yPoint]); 
-        console.log('x: ' + xPoint  + 'y: ' + yPoint);
-      }
-
-    }
-    
-    getMax = function(){
-      var xMin = parseInt(document.getElementById("a").value);
-      var xMax = parseInt(document.getElementById("b").value);     
-      var yMax = 0;
-
-      for(var i = 1; i <= xMax; i ++){
-
-        var xToEvaluate = Math.random() * (+xMax - +xMin) + +xMin;
-  
-        var datum = instance.options.data[0]
-        var scope = {
-          x: xToEvaluate
-        }
-        console.log('evaluated: ' + xToEvaluate + 'result: ' + functionPlot.eval.builtIn(datum,'fn',scope))
-
-        if(yMax < functionPlot.eval.builtIn(datum,'fn',scope)){
-          yMax = functionPlot.eval.builtIn(datum,'fn',scope)
-        }
-
-      }
-      console.log('Max found: ' + yMax);
-      console.log('New max: ' + yMax * 1.20);
-      return yMax;
-
-    }
-    
-    getMin = function(){
-      var xMin = parseInt(document.getElementById("a").value);
-      var xMax = parseInt(document.getElementById("b").value);     
-      // var shots = parseInt(document.getElementById("shots").value);
-      var yMin = 0;
-
-      for(var i = 1; i <= xMax; i ++){
-
-        var xToEvaluate = Math.random() * (+xMax - +xMin) + +xMin;
-  
-        var datum = instance.options.data[0]
-        var scope = {
-          x: xToEvaluate
-        }
-        console.log('evaluated: ' + xToEvaluate + 'result: ' + functionPlot.eval.builtIn(datum,'fn',scope))
-
-        if(yMin > functionPlot.eval.builtIn(datum,'fn',scope)){
-          yMin = functionPlot.eval.builtIn(datum,'fn',scope)
-        }
-
-      }
-      console.log('Min found: ' + yMin);
-      console.log('New Min: ' + yMin * 1.20);
-
-    
-    }
-
 }
 
 window.d3 = d3;
@@ -133,29 +66,91 @@ var instance = functionPlot({
     //   }
     },
     {
-        points: [
-          // [1, 1],
-          // [2, 1],
-          // [2, 2],
-          // [1, 2],
-          // [1, 1]
-        ],
+        points: [],
         fnType: 'points',
+        color: 'green',
         graphType: 'scatter'
-      }
-    // {
-        // fnType: "implicit",
-        // color: "green",
-        // fn: "x = 3 + 0*y"
-        // fnType: "points",
-        // color: "red",
-        // points: "0,1"
-    // },
+    },
+    {
+        points: [],
+        fnType: 'points',
+        color: 'red',
+        graphType: 'scatter'
+    }
   ],
 });
 
-var grafico = new Grafico();
-document.getElementById("btn").addEventListener("click" , grafico.genRandomPoints);
-document.getElementById("btn").addEventListener("click" , grafico.draw_graph);
+function getMax(){
+    var xMin = parseInt(document.getElementById("a").value);
+    var xMax = parseInt(document.getElementById("b").value);     
+    var yMax = 0;
 
-document.getElementById("btn").addEventListener("click" , grafico.getMax);
+    for(var i = xMin; i <= xMax; i ++){
+
+      var xToEvaluate = i;
+
+      var datum = instance.options.data[0]
+      var scope = {
+        x: xToEvaluate
+      }
+
+      if(yMax < functionPlot.eval.builtIn(datum,'fn',scope)){
+        yMax = functionPlot.eval.builtIn(datum,'fn',scope)
+      }
+    }
+    return yMax;
+  }
+
+  function getMin(){
+    var xMin = parseInt(document.getElementById("a").value);
+    var xMax = parseInt(document.getElementById("b").value);     
+    var yMin = 0;
+
+    for(var i = xMin; i <= xMax; i ++){
+
+      var xToEvaluate = i;
+
+      var datum = instance.options.data[0]
+      var scope = {
+        x: xToEvaluate
+      }
+
+      if(yMin > functionPlot.eval.builtIn(datum,'fn',scope)){
+        yMin = functionPlot.eval.builtIn(datum,'fn',scope)
+      }
+
+    }
+    return yMin;
+  }
+
+    function genRandomPoints (xMin, xMax, yMin, yMax){
+
+      var shots = parseInt(document.getElementById("shots").value);
+      var result = [0,0];
+      instance.options.data[1].fnType = 'points';
+      instance.options.data[1].graphType = 'scatter';
+
+      for(var shot = 0; shot < shots; shot ++){
+
+        var xPoint = Math.random() * (+xMax - +xMin) + +xMin;
+        var yPoint = Math.random() * (+yMax - +yMin) + +yMin;
+        var image = functionPlot.eval.builtIn(instance.options.data[0],'fn',{x: xPoint})
+
+        if ((yPoint < image && yPoint > 0) || (yPoint > image && yPoint < 0)) {
+            instance.options.data[1].points.push([xPoint,yPoint]); 
+            if (yPoint > 0){
+                result[0] = result[0] + 1;
+            }else{
+                result[0] = result[0] - 1;
+            }
+        }else{
+            instance.options.data[2].points.push([xPoint,yPoint]); 
+            result[1] = result[1] + 1;
+        }
+      }
+      return result;
+
+    }
+
+ var grafico = new Grafico();
+document.getElementById("btn").addEventListener("click" , grafico.draw_graph);
